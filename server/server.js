@@ -15,18 +15,6 @@ app.use(cors());
 app.get("/", (req, res) => res.send("API Working"));
 app.post('/clerk', express.json(), clerkWebhooks);
 
-// New route to fetch queries
-app.get('/queries', async (req, res) => {
-  try {
-    const queries = await Query.find(); // Fetch all queries from the database
-    console.log(queries);
-    res.json(queries);
-  } catch (error) {
-    console.error("Error fetching queries:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
 //Port
 const PORT = process.env.PORT || 3000;
 
