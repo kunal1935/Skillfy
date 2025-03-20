@@ -3,7 +3,7 @@ import cors from "cors";
 import "dotenv/config"; 
 import connectDB from "./configs/mongodb.js";
 import { clerkWebhooks } from "./contollers/webhooks.js";
-import Query from "./models/queryModel.js"; // Ensure the Query model is correctly implemented
+
 
 // Initialize Express
 const app = express();
