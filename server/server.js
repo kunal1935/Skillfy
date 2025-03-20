@@ -19,6 +19,7 @@ app.post('/clerk', express.json(), clerkWebhooks);
 app.get('/queries', async (req, res) => {
   try {
     const queries = await Query.find(); // Fetch all queries from the database
+    console.log(queries);
     res.json(queries);
   } catch (error) {
     console.error("Error fetching queries:", error);
