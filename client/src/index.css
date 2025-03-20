@@ -1,0 +1,130 @@
+@import "tailwindcss" ;
+
+@theme{
+  --background-color: #f5f5f5;
+  --text-color: #333;
+  --border-color: #ddd;
+  --primary-color: #3498db;
+  --secondary-color: #e74c3c;
+  --hover-color: #34495e;
+  --active-color: #2980b9;
+  --success-color: #2ecc71;
+  --warning-color: #f1c40f;
+  --danger-color: #e74c3c;
+  --info-color: #3498db;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --muted-color: #6c757d;
+  --breakpoint-sm: 600px;
+  --h1-font-size-lg: 3rem;
+  --h1-font-size-md: 2.5rem;
+  --h1-font-size-sm: 2rem;
+  --h2-font-size-lg: 2.5rem;
+  --h2-font-size-md: 2rem;
+  --h2-font-size-sm: 1.75rem;
+  --h3-font-size-lg: 2rem;
+  --h3-font-size-md: 1rem;
+  --h3-font-size-sm: 1.5rem;
+  --max-width-course-card: 224px;
+  --box-shadow-custom-card: 0px 8px 15px 6px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  font-family: 'Outfit', sans-serif;
+}
+
+h1 {
+  font-size: var(--h1-font-size-sm);
+}
+
+h2 {
+  font-size: var(--h2-font-size-sm);
+}
+
+h3 {
+  font-size: var(--h3-font-size-sm);
+}
+
+@media (min-width: var(--breakpoint-sm)) {
+  h1 {
+    font-size: var(--h1-font-size-md);
+  }
+
+  h2 {
+    font-size: var(--h2-font-size-md);
+  }
+
+  h3 {
+    font-size: var(--h3-font-size-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  h1 {
+    font-size: var(--h1-font-size-lg);
+  }
+
+  h2 {
+    font-size: var(--h2-font-size-lg);
+  }
+
+  h3 {
+    font-size: var(--h3-font-size-lg);
+  }
+}
+
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: var(--light-color);
+  box-shadow: var(--box-shadow-custom-card);
+  border-radius: 8px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.course-card {
+  background-color: var(--light-color);
+  box-shadow: var(--box-shadow-custom-card);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 20px;
+  max-width: var(--max-width-course-card);
+  height: auto; /* Adjust height to auto */
+}
+
+.course-card img {
+  width: 100%;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.course-card .details {
+  padding-top: 15px;
+}
+
+.course-card .details .price {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.course-card .details .original-price {
+  text-decoration: line-through;
+  color: var(--muted-color);
+}
+
+.course-card .details .discount {
+  color: var(--secondary-color);
+}
