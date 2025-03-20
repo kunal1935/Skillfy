@@ -17,7 +17,7 @@ export const clerkWebhooks = async (req, res) => {
         {
           const userData = {
             _id: data.id,
-            email: data.email_address[0].email_address,
+            email: data.email_addresses[0].email_address,
             name: data.first_name + " " + data.last_name,
             imageUrl: data.image_url,
           };
@@ -47,6 +47,6 @@ export const clerkWebhooks = async (req, res) => {
         break;
     }
   } catch (error) {
-    res.jos({ success: false, message: error.message });
+    res.json({ success: false, message: error.message });
   }
 };
