@@ -39,6 +39,7 @@ const clerkWebhook = async (req, res) => {
                     email: data.email_addresses[0].email_address,
                     imageUrl: data.image_url,
                 });
+                res.status(200).json({ success: true , message: "User created successfully"});
                 break;
 
             case 'user.updated':
@@ -48,11 +49,13 @@ const clerkWebhook = async (req, res) => {
                     email: data.email_addresses[0].email_address,
                     imageUrl: data.image_url,
                 });
+                res.status(200).json({ success: true, message: "User updated successfully"});
                 break;
 
             case 'user.deleted':
                 console.log("User deleted:", data);
                 await User.findByIdAndDelete(data.id);
+                res.status(200).json({ success: true, message: "User deleted successfully"});
                 break;
 
             default:
