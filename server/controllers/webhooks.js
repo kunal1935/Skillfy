@@ -32,7 +32,7 @@ const clerkWebhook = async (req, res) => {
         // Process webhook asynchronously
         if (type === "user.created") {
             console.log("Processing 'user.created' event...");
-            User.create({
+             await new User({
                 _id: data?.id,
                 name: `${data?.first_name} ${data?.last_name}`,
                 email: data?.email_addresses[0]?.email_address,
