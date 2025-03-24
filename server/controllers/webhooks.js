@@ -26,8 +26,9 @@ const clerkWebhook = async (req, res) => {
 
         const { data, type } = req.body;
 
-        // Respond immediately to avoid timeout
-        res.status(200).json({ success: true });
+        console.log("Webhook type:", type);
+        console.log("Webhook data:", data);
+        res.status(200).json({ success: true, message: "Webhook received successfully", data, type});
 
         // Process webhook asynchronously
         switch (type) {
