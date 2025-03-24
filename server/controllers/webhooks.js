@@ -22,9 +22,14 @@ const clerkWebhook = async (req, res) => {
         }
 
         await whook.verify(payload, headers);
+        console.log("Webhook verified successfully");
 
         const { data, type } = req.body;
 
+        // Respond immediately to avoid timeout
+        res.status(200).json({ success: true });
+
+        // Process webhook asynchronously
         switch (type) {
             case 'user.created':
                 console.log("User registered:", data);
@@ -34,7 +39,6 @@ const clerkWebhook = async (req, res) => {
                     email: data.email_addresses[0].email_address,
                     imageUrl: data.image_url,
                 });
-                res.json({});
                 break;
 
             case 'user.updated':
@@ -44,24 +48,24 @@ const clerkWebhook = async (req, res) => {
                     email: data.email_addresses[0].email_address,
                     imageUrl: data.image_url,
                 });
-                res.json({});
                 break;
 
             case 'user.deleted':
                 console.log("User deleted:", data);
                 await User.findByIdAndDelete(data.id);
-                res.json({});
                 break;
 
             default:
                 console.log("Unhandled webhook type:", type);
-                res.status(400).json({ success: false, message: "Unhandled webhook type" });
                 break;
         }
     } catch (error) {
         console.error("Error processing webhook:", error);
-        res.status(400).json({ success: false, message: error.message });
+        // Ensure response is sent even if an error occurs
+        if (!res.headersSent) {
+            res.status(400).json({ success: false, message: error.message });
+        }
     }
-}
+};
 
 export default clerkWebhook;
