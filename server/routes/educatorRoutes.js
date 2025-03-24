@@ -3,6 +3,6 @@ import {upRoleToEduactor} from '../controllers/educatorController.js';
 
 const router = express.Router();
 
-educatorRouter.get('/update-role',upRoleToEduactor);
+router.get('/update-role',upRoleToEduactor);
 
-export default educatorRouter;
+export default router;

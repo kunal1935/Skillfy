@@ -6,6 +6,8 @@ dotenv.config();
 
 const clerkWebhook = async (req, res) => {
     try {
+        console.log("Webhook received:", req.body); // Log the incoming webhook payload
+
         const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
         await whook.verify(JSON.stringify(req.body), {
@@ -18,6 +20,7 @@ const clerkWebhook = async (req, res) => {
 
         switch (type) {
             case 'user.created': {
+                console.log("User registered:", data);
                 const userData = {
                     _id: data.id,
                     name: data.first_name + " " + data.last_name,
@@ -31,6 +34,7 @@ const clerkWebhook = async (req, res) => {
             }
 
             case 'user.updated': {
+                console.log("User updated:", data);
                 const updatedUserData = {
                     _id: data.id,
                     name: data.first_name + " " + data.last_name,
@@ -50,10 +54,11 @@ const clerkWebhook = async (req, res) => {
             }
         
             default:
+                console.log("Unhandled webhook type:", type);
                 break;
         }
     } catch (error) {
-        console.error(error);
+        console.error("Error processing webhook:", error);
         res.json({ success: false, message: error.message });
     }
 }
