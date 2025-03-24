@@ -40,6 +40,7 @@ const clerkWebhook = async (req, res) => {
             })
                 .then((user) => {
                     console.log("User created in MongoDB:", user);
+                    res.status(200).send({ success: true, message: "User created successfully", data, type });
                 })
                 .catch((dbError) => {
                     console.error("Error creating user in MongoDB:", dbError);
