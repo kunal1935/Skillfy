@@ -31,37 +31,40 @@ const clerkWebhook = async (req, res) => {
         res.status(200).json({ success: true, message: "Webhook received successfully", data, type});
 
         // Process webhook asynchronously
-        switch (type) {
-            case 'user.created':
-                console.log("User registered:", data);
-                await User.create({
-                    _id: data.id,
-                    name: `${data.first_name} ${data.last_name}`,
-                    email: data.email_addresses[0].email_address,
-                    imageUrl: data.image_url,
-                });
-                res.status(200).json({ success: true , message: "User created successfully"});
-                break;
-
-            case 'user.updated':
-                console.log("User updated:", data);
-                await User.findByIdAndUpdate(data.id, {
-                    name: `${data.first_name} ${data.last_name}`,
-                    email: data.email_addresses[0].email_address,
-                    imageUrl: data.image_url,
-                });
-                res.status(200).json({ success: true, message: "User updated successfully"});
-                break;
-
-            case 'user.deleted':
-                console.log("User deleted:", data);
-                await User.findByIdAndDelete(data.id);
-                res.status(200).json({ success: true, message: "User deleted successfully"});
-                break;
-
-            default:
-                console.log("Unhandled webhook type:", type);
-                break;
+        if (type === "user.created") {
+            const user = User.create({
+                _id: data.id,
+                name: `${data?.first_name} ${data?.last_name}`,
+                email: data?.email_addresses[0]?.email_address,
+                imageurl: data?.image_url,   
+            });
+            await user.save();
+            console.log("User created:", user);
+            // Add any additional processing logic here
+        }
+        else if (type === "user.updated") {
+            const { id, emailAddress, firstName, lastName } = data;
+            const user = await User.findById(id);
+            if (!user) {
+                throw new Error("User not found");
+            }
+            user.name = `${firstName} ${lastName}`;
+            user.email = emailAddress;
+            await user.save();
+            console.log("User updated:", user);
+            // Add any additional processing logic here
+        }
+        else if (type === "user.deleted") {
+            const { id } = data;
+            const user = await User.findByIdAndDelete(id);
+            if (!user) {
+                throw new Error("User not found");
+            }
+            console.log("User deleted:", user);
+            // Add any additional processing logic here
+        }
+        else {
+            console.log("Unhandled webhook type:", type);
         }
     } catch (error) {
         console.error("Error processing webhook:", error);
