@@ -32,53 +32,54 @@ const clerkWebhook = async (req, res) => {
         // Send response immediately after verification
         res.status(200).json({ success: true, message: "Webhook verified successfully", data, type });
 
-        // Process webhook asynchronously using setImmediate
-        setImmediate(async () => {
-            if (type === "user.created") {
-                console.log("Processing 'user.created' event...");
-                try {
-                    const user = await User.create({
-                        _id: data?.id,
-                        name: `${data?.first_name} ${data?.last_name}`,
-                        email: data?.email_addresses[0]?.email_address,
-                        imageUrl: data?.image_url,
-                    });
-                    console.log("User created in MongoDB:", user);
-                } catch (dbError) {
-                    console.error("Error creating user in MongoDB:", dbError);
-                }
-            } else if (type === "user.updated") {
-                console.log("Processing 'user.updated' event...");
-                try {
-                    const user = await User.findById(data?.id);
-                    if (!user) {
-                        console.error("User not found for update:", data?.id);
-                        return;
-                    }
-                    user.name = `${data?.first_name} ${data?.last_name}`;
-                    user.email = data?.email_addresses[0]?.email_address;
-                    user.imageUrl = data?.image_url;
-                    const updatedUser = await user.save();
-                    console.log("User updated in MongoDB:", updatedUser);
-                } catch (dbError) {
-                    console.error("Error updating user in MongoDB:", dbError);
-                }
-            } else if (type === "user.deleted") {
-                console.log("Processing 'user.deleted' event...");
-                try {
-                    const deletedUser = await User.findByIdAndDelete(data?.id);
-                    if (!deletedUser) {
-                        console.error("User not found for deletion:", data?.id);
-                        return;
-                    }
-                    console.log("User deleted from MongoDB:", deletedUser);
-                } catch (dbError) {
-                    console.error("Error deleting user from MongoDB:", dbError);
-                }
-            } else {
-                console.log("Unhandled webhook type:", type);
+        // Debugging: Log type before processing
+        console.log("Type before processing:", type);
+
+        // Process webhook directly (remove setImmediate for debugging)
+        if (type === "user.created") {
+            console.log("Processing 'user.created' event...");
+            try {
+                const user = await User.create({
+                    _id: data?.id,
+                    name: `${data?.first_name} ${data?.last_name}`,
+                    email: data?.email_addresses[0]?.email_address,
+                    imageUrl: data?.image_url,
+                });
+                console.log("User created in MongoDB:", user);
+            } catch (dbError) {
+                console.error("Error creating user in MongoDB:", dbError);
             }
-        });
+        } else if (type === "user.updated") {
+            console.log("Processing 'user.updated' event...");
+            try {
+                const user = await User.findById(data?.id);
+                if (!user) {
+                    console.error("User not found for update:", data?.id);
+                    return;
+                }
+                user.name = `${data?.first_name} ${data?.last_name}`;
+                user.email = data?.email_addresses[0]?.email_address;
+                user.imageUrl = data?.image_url;
+                const updatedUser = await user.save();
+                console.log("User updated in MongoDB:", updatedUser);
+            } catch (dbError) {
+                console.error("Error updating user in MongoDB:", dbError);
+            }
+        } else if (type === "user.deleted") {
+            console.log("Processing 'user.deleted' event...");
+            try {
+                const deletedUser = await User.findByIdAndDelete(data?.id);
+                if (!deletedUser) {
+                    console.error("User not found for deletion:", data?.id);
+                    return;
+                }
+                console.log("User deleted from MongoDB:", deletedUser);
+            } catch (dbError) {
+                console.error("Error deleting user from MongoDB:", dbError);
+            }
+        } else {
+            console.log("Unhandled webhook type:", type);
+        }
     } catch (error) {
         console.error("Error processing webhook:", error);
         // Ensure response is sent even if an error occurs
