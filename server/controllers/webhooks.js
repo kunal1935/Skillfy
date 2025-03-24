@@ -83,8 +83,6 @@ const clerkWebhook = async (req, res) => {
             console.log("Unhandled webhook type:", type);
         }
 
-        // Send response immediately
-        res.status(200).json({ success: true, message: "Webhook received successfully", data, type });
     } catch (error) {
         console.error("Error processing webhook:", error);
         // Ensure response is sent even if an error occurs
