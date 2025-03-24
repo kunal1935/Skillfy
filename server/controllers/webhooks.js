@@ -26,17 +26,21 @@ const clerkWebhook = async (req, res) => {
 
         const { data, type } = req.body;
 
-        console.log("Webhook type:", type);
+        console.log("Webhook type:", type, "Type type:", typeof type);
         console.log("Webhook data:", data);
+        console.log("Request body:", req.body);
+
+        // Normalize type to avoid case sensitivity issues
+        const normalizedType = type?.toLowerCase();
 
         // Send response immediately after verification
         res.status(200).json({ success: true, message: "Webhook verified successfully", data, type });
 
-        // Debugging: Log type before processing
-        console.log("Type before processing:", type);
+        // Debugging: Log normalized type before processing
+        console.log("Normalized type before processing:", normalizedType);
 
-        // Process webhook directly (remove setImmediate for debugging)
-        if (type === "user.created") {
+        // Process webhook directly
+        if (normalizedType === "user.created") {
             console.log("Processing 'user.created' event...");
             try {
                 const user = await User.create({
@@ -49,7 +53,7 @@ const clerkWebhook = async (req, res) => {
             } catch (dbError) {
                 console.error("Error creating user in MongoDB:", dbError);
             }
-        } else if (type === "user.updated") {
+        } else if (normalizedType === "user.updated") {
             console.log("Processing 'user.updated' event...");
             try {
                 const user = await User.findById(data?.id);
@@ -65,7 +69,7 @@ const clerkWebhook = async (req, res) => {
             } catch (dbError) {
                 console.error("Error updating user in MongoDB:", dbError);
             }
-        } else if (type === "user.deleted") {
+        } else if (normalizedType === "user.deleted") {
             console.log("Processing 'user.deleted' event...");
             try {
                 const deletedUser = await User.findByIdAndDelete(data?.id);
@@ -78,7 +82,7 @@ const clerkWebhook = async (req, res) => {
                 console.error("Error deleting user from MongoDB:", dbError);
             }
         } else {
-            console.log("Unhandled webhook type:", type);
+            console.log("Unhandled webhook type:", normalizedType);
         }
     } catch (error) {
         console.error("Error processing webhook:", error);
