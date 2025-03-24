@@ -1,12 +1,18 @@
 import { Webhook } from "svix";
 import User from "../models/User.js";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 
 dotenv.config();
 
 const clerkWebhook = async (req, res) => {
   try {
     console.log("Webhook received:", req.body);
+
+    // Check if MongoDB connection is ready
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error("MongoDB connection is not established");
+    }
 
     // Initialize the webhook verifier
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
