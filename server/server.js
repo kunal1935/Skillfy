@@ -15,8 +15,13 @@ app.use(clerkMiddleware())
 //Routes
 app.get('/',(req, res) => res.send("API workings"));
 app.post('/clerk', express.json(), (req, res, next) => {
-    console.log("Incoming Clerk webhook request:", req.body); // Log the request for debugging
-    next();
+    try {
+        console.log("Incoming Clerk webhook request:", req.body); // Log the request for debugging
+        next();
+    } catch (error) {
+        console.error("Error in webhook middleware:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
 }, clerkWebhook);
 app.use('/api/educator',express.json(),educatorRoutes);
 
