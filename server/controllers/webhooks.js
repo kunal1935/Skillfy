@@ -28,50 +28,62 @@ const clerkWebhook = async (req, res) => {
 
         console.log("Webhook type:", type);
         console.log("Webhook data:", data);
-        res.status(200).json({ success: true, message: "Webhook received successfully", data, type});
 
         // Process webhook asynchronously
         if (type === "user.created") {
-            try {
-                const user = await User.create({
-                    _id: data?.id,
-                    name: `${data?.first_name} ${data?.last_name}`,
-                    email: data?.email_addresses[0]?.email_address,
-                    imageUrl: data?.image_url,
+            console.log("Processing 'user.created' event...");
+            User.create({
+                _id: data?.id,
+                name: `${data?.first_name} ${data?.last_name}`,
+                email: data?.email_addresses[0]?.email_address,
+                imageUrl: data?.image_url,
+            })
+                .then((user) => {
+                    console.log("User created in MongoDB:", user);
+                })
+                .catch((dbError) => {
+                    console.error("Error creating user in MongoDB:", dbError);
                 });
-                console.log("User created in MongoDB:", user);
-            } catch (dbError) {
-                console.error("Error creating user in MongoDB:", dbError);
-            }
         } else if (type === "user.updated") {
-            try {
-                const user = await User.findById(data?.id);
-                if (!user) {
-                    console.error("User not found for update:", data?.id);
-                    return;
-                }
-                user.name = `${data?.first_name} ${data?.last_name}`;
-                user.email = data?.email_addresses[0]?.email_address;
-                user.imageUrl = data?.image_url;
-                await user.save();
-                console.log("User updated in MongoDB:", user);
-            } catch (dbError) {
-                console.error("Error updating user in MongoDB:", dbError);
-            }
+            console.log("Processing 'user.updated' event...");
+            User.findById(data?.id)
+                .then((user) => {
+                    if (!user) {
+                        console.error("User not found for update:", data?.id);
+                        return;
+                    }
+                    user.name = `${data?.first_name} ${data?.last_name}`;
+                    user.email = data?.email_addresses[0]?.email_address;
+                    user.imageUrl = data?.image_url;
+                    return user.save();
+                })
+                .then((updatedUser) => {
+                    if (updatedUser) {
+                        console.log("User updated in MongoDB:", updatedUser);
+                    }
+                })
+                .catch((dbError) => {
+                    console.error("Error updating user in MongoDB:", dbError);
+                });
         } else if (type === "user.deleted") {
-            try {
-                const user = await User.findByIdAndDelete(data?.id);
-                if (!user) {
-                    console.error("User not found for deletion:", data?.id);
-                    return;
-                }
-                console.log("User deleted from MongoDB:", user);
-            } catch (dbError) {
-                console.error("Error deleting user from MongoDB:", dbError);
-            }
+            console.log("Processing 'user.deleted' event...");
+            User.findByIdAndDelete(data?.id)
+                .then((deletedUser) => {
+                    if (!deletedUser) {
+                        console.error("User not found for deletion:", data?.id);
+                        return;
+                    }
+                    console.log("User deleted from MongoDB:", deletedUser);
+                })
+                .catch((dbError) => {
+                    console.error("Error deleting user from MongoDB:", dbError);
+                });
         } else {
             console.log("Unhandled webhook type:", type);
         }
+
+        // Send response immediately
+        res.status(200).json({ success: true, message: "Webhook received successfully", data, type });
     } catch (error) {
         console.error("Error processing webhook:", error);
         // Ensure response is sent even if an error occurs
