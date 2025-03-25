@@ -24,7 +24,7 @@ app.post('/clerk', express.json(), (req, res, next) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }, clerkWebhook);
-app.use('/api/educator', express.json(), educatorRouter);
+app.use('/api/educator', express.json(), educatorRoutes);
 
 // Port
 const PORT = process.env.PORT || 5050;
