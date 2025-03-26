@@ -4,7 +4,7 @@ import 'dotenv/config';
 import connectDB from './configs/database.js';
 import { clerkMiddleware } from '@clerk/express';
 import clerkWebhook from './controllers/webhooks.js';
-import educatorRoutes from './routes/educatorRoutes.js';
+import educatorRouter from './routes/educatorRoutes.js';
 
 // Initialize express
 const app = express();
@@ -24,7 +24,7 @@ app.post('/clerk', express.json(), (req, res, next) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }, clerkWebhook);
-app.use('/api/educator', express.json(), educatorRoutes);
+app.use('/api/educator', express.json(), educatorRouter);
 
 // Port
 const PORT = process.env.PORT || 5050;
