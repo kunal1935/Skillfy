@@ -10,10 +10,6 @@ import { response } from "express";
 dotenv.config();
 
 const clerkWebhook = async (req, res) => {
-  if (mongoose.connection.readyState !== 1) { // Check if MongoDB is connected
-    return res.status(500).send('Error: MongoDB connection is not established');
-  }
-
   try {
     console.log("Webhook received:", req.body);
 

@@ -15,7 +15,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(clerkMiddleware());
-connectDB();
 
 // Routes
 app.get('/', (req, res) => res.send("API workings"));
@@ -36,14 +35,13 @@ app.post('/stripe',express.raw({type:'application/json'}),stripeWebhooks)
 const PORT = process.env.PORT || 5050;
 
 // Connect to MongoDB and start the server
-
-
+connectDB()
 await connectCloudinary().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`); // Logging the server is running on port
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`); // Logging the server is running on port
+        });
+    })
+    .catch((error) => {
+        console.error("Failed to connect to MongoDB:", error);
+        process.exit(1); // Exit the process if the database connection fails
     });
-})
-.catch((error) => {
-    console.error("Failed to connect to MongoDB:", error);
-    process.exit(1); // Exit the process if the database connection fails
-});
