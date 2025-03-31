@@ -35,7 +35,7 @@ app.post('/stripe',express.raw({type:'application/json'}),stripeWebhooks)
 const PORT = process.env.PORT || 5050;
 
 // Connect to MongoDB and start the server
-connectDB()
+await connectDB()
 await connectCloudinary().then(() => {
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`); // Logging the server is running on port
