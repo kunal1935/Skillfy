@@ -39,6 +39,7 @@ export const userEnrolledCourses = async (req, res) => {
     }
 
     const userData = await User.findById(userId).populate("enrolledCourses");
+    console.log(userData);
 
     res.json({ success: true, enrolledCourses: userData.enrolledCourses });
   } catch (error) {

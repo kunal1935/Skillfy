@@ -35,13 +35,19 @@ app.post('/stripe',express.raw({type:'application/json'}),stripeWebhooks)
 const PORT = process.env.PORT || 5050;
 
 // Connect to MongoDB and start the server
+
 connectDB()
+.catch((error) => {
+    console.error("Failed to connect to MongoDB:", error);
+    process.exit(1); // Exit the process if the database connection fails
+});
+
 await connectCloudinary().then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`); // Logging the server is running on port
-        });
-    })
-    .catch((error) => {
-        console.error("Failed to connect to MongoDB:", error);
-        process.exit(1); // Exit the process if the database connection fails
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`); // Logging the server is running on port
     });
+})
+.catch((error) => {
+    console.error("Failed to connect to MongoDB:", error);
+    process.exit(1); // Exit the process if the database connection fails
+});

@@ -9,10 +9,10 @@ import { Link } from 'react-router-dom'
   return (
     <Link to={'/courses/'+ course._id} onClick={()=> scrollTo(0,0,)} 
     className='border border-amber-500/30 pb-6 overflow-hidden rounded-lg'>
-      <img className='w-full'  src={course.courseThumbnail} alt="" />
+      <img className='w-full'  src={course?.courseThumbnail} alt="" />
       <div className='p-3 text-left'>
-        <h5 className=' font-semibold text-sm'>{course.courseTitle}</h5>
-        <p className='text-gray-500'>{course.educator.name}</p>
+        <h5 className=' font-semibold text-sm'>{course?.courseTitle}</h5>
+        <p className='text-gray-500'>{course?.educator?.name}</p>
         <div className='flex items-center space-x-2  '>
           <p>
             {calculateRating(course)}
@@ -27,7 +27,7 @@ import { Link } from 'react-router-dom'
           </p>
         </div>
         <p className='text-base font-semibold text-gray-800'>{currency}
-          {(course.coursePrice-course.discount * course.coursePrice/100).toFixed(2)}
+          {(course?.coursePrice-course.discount * course?.coursePrice/100).toFixed(2)}
         </p>
       </div>
     </Link>
