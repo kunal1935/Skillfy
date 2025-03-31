@@ -36,12 +36,7 @@ const PORT = process.env.PORT || 5050;
 
 // Connect to MongoDB and start the server
 
-connectDB()
-.catch((error) => {
-    console.error("Failed to connect to MongoDB:", error);
-    process.exit(1); // Exit the process if the database connection fails
-});
-
+connectDB();
 await connectCloudinary().then(() => {
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`); // Logging the server is running on port
