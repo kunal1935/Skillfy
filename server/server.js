@@ -15,6 +15,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(clerkMiddleware());
+connectDB();
 
 // Routes
 app.get('/', (req, res) => res.send("API workings"));
@@ -36,7 +37,7 @@ const PORT = process.env.PORT || 5050;
 
 // Connect to MongoDB and start the server
 
-connectDB();
+
 await connectCloudinary().then(() => {
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`); // Logging the server is running on port
