@@ -21,7 +21,7 @@ const Navbar = () => {
         return;
       }
       const token = await getToken();
-      const {data} = await axios.get(backendUrl + 'api/educator/update-role',
+      const {data} = await axios.get('http://localhost:7474/api/educator/update-role',
         {headers:{Authorization : `Bearer ${token}`}}) 
     
       if(data.success){

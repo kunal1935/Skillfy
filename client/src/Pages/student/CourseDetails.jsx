@@ -6,11 +6,12 @@ import { assets } from "../../assets/assets";
 import humanizeDuration from "humanize-duration";
 import Footer from "../../Components/student/Footer.jsx";
 import YouTube from "react-youtube";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const CourseDetails = () => {
   const { id } = useParams();
   const [courseData, setCourseData] = useState(null);
-
   const [openSections, setOpenSections] = useState({});
   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false);
   const [playerData, setPlayerData] = useState(null);
@@ -21,19 +22,56 @@ const CourseDetails = () => {
     calculateNoOfLecture,
     calculateCourseDuration,
     calculateChapterTime,
-    currency,
+    currency,backendUrl,userData,getToken
   } = useContext(AppContext);
 
-  const fetchCourseData = () => {
-    if (allCourses?.length > 0) {
-      const findCourse = allCourses.find((course) => course._id === id);
-      setCourseData(findCourse); // Directly set `findCourse` as `courseData`
+  console.log(userData);
+  const fetchCourseData = async () => {
+      try{
+    const{data} = await axios.get(backendUrl  +'/api/course/'+ id)
+    if(data.success){
+      setCourseData(data.courseData)
+    }else{
+      toast.error(data.message)
     }
-  };
+      } catch(error) {
+        toast.error(error.message)
+  
+    }
+  }
 
+  const enrollCourse = async ()=>{
+    try{
+      if(!userData){
+        return toast.warn('Login to Enroll')
+      }
+       if(isAlreadyEnrolled){
+        return toast.warn('Already Enrolled')
+       }
+       const token = await getToken();
+       const{data} = await axios.post('http://localhost:7474/api/user/purchase',
+        {courseId: courseData._id},{headers :{Authorization: `Bearer ${token}`}})
+        if(data.success){
+          const{session_url} = data
+          window.location.replace(session_url)
+        }else{
+          toast.error(data.message)
+        }
+
+    }catch(error){
+      toast.error(error.message)
+    }
+  }
+  
   useEffect(() => {
     fetchCourseData();
-  }, [id, allCourses?.length]); // Use `allCourses?.length` to stabilize the dependency array
+  }, [])
+
+  useEffect(() => {
+    if(userData && courseData){
+      setIsAlreadyEnrolled(userData.enrolledCourses.includes(courseData._id))
+    }
+  }, [userData,courseData]);
 
   const toggleSection = (index) => {
     setOpenSections((prev) => ({ ...prev, [index]: !prev[index] }));
@@ -84,7 +122,11 @@ const CourseDetails = () => {
               </div>
               <p className="text-sm">
                 Course by{" "}
-                <span className="text-blue-600 underline">Skillfy</span>
+                <span className="text-blue-600 underline">
+                  {courseData.educator && typeof courseData.educator === "object" 
+                    ? courseData.educator.name 
+                    : courseData.educator || "Unknown Educator"}
+                </span>
               </p>
               <div className="pt-8 text-gray-800">
                 <h4 className="text-xl font-semibold">Course Structure</h4>
@@ -123,10 +165,7 @@ const CourseDetails = () => {
                         >
                           <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-gray-600 border-t border-gray-300">
                             {chapter.chapterContent.map((lecture, i) => (
-                              <li
-                                key={i}
-                                className="flex items-start gap-2 py-1"
-                              >
+                              <li key={i} className="flex items-start gap-2 py-1">
                                 <img
                                   src={assets.play_icon}
                                   alt="Play icon"
@@ -139,9 +178,7 @@ const CourseDetails = () => {
                                       <p
                                         onClick={() =>
                                           setPlayerData({
-                                            videoId: extractVideoId(
-                                              lecture.lectureUrl
-                                            ),
+                                            videoId: extractVideoId(lecture.lectureUrl),
                                           })
                                         }
                                         className="text-blue-500 cursor-pointer"
@@ -239,7 +276,7 @@ const CourseDetails = () => {
                     <p>{calculateNoOfLecture(courseData)} lessons</p>
                   </div>
                 </div>
-                <button className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">
+                <button onClick={enrollCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">
                   {isAlreadyEnrolled ? "Already Enrolled" : "Enroll Now"}
                 </button>
                 <div className="pt-6">

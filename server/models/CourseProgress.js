@@ -1,4 +1,3 @@
-import { type } from "express/lib/response";
 import mongoose from "mongoose";
 
 const courseProgressSchema = new mongoose.Schema({
@@ -8,4 +7,5 @@ const courseProgressSchema = new mongoose.Schema({
      lectureCompleted:[]
 },{minimize:false});
 
-export const CourseProgress = mongoose.model('CourseProgress',courseProgressSchema)
+const CourseProgress = mongoose.model('CourseProgress',courseProgressSchema)
+export default CourseProgress;
