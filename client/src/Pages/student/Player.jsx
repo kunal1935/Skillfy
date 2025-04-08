@@ -16,10 +16,11 @@ const Player = () => {
   const [courseData, setCourseData] = useState(null);
   const [openSections, setOpenSections] = useState({});
   const [playerData, setPlayerData] = useState(null);
+  
   const [videoError, setVideoError] = useState(false);
   const [progressData,setProgressData] = useState(null);
   const [initialRating,setInitialRating] = useState(null);
-
+  
   const getCourseData = () => {
     enrolledCourses.map((course)=>{
 
@@ -46,9 +47,12 @@ const Player = () => {
   }, [enrolledCourses, courseId]);
   
   const markLectureAsCompleted = async (lectureId)=>{
+    console.log("Marking lecture as completed:", lectureId); // Debugging
+
+    const userId = userData._id;
     try{
       const token = await getToken()
-      const {data} =await axios.post(backendUrl +'/api/user/update-course-progress',{courseId,lectureId},{headers :{Authorization:`Bearer $ {token}`}})
+      const {data} =await axios.post(backendUrl +'/api/user/update-course-progress',{courseId,lectureId, userId},{headers :{Authorization:`Bearer $ {token}`}})
     if(data.success){
       toast.success(data.message)
       getCourseProgress()
@@ -61,10 +65,12 @@ const Player = () => {
     }
   }
   const getCourseProgress = async ()=>{
+
     try{
       const token =await getToken()
       const{data} = await axios.post(backendUrl + '/api/user/get-course-progress',{courseId}, {headers:{Authorization:`Bearer ${token}`}})
       if (data.success){
+        console.log("Fetched progress data:", data.progressData); // Debugging
         setProgressData(data.progressData)
       }else{
         toast.error(data.message)
@@ -123,12 +129,20 @@ const Player = () => {
                   <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-gray-600 border-t border-gray-300">
                     {chapter.chapterContent.map((lecture, i) => (
                       <li key={i} className="flex items-start gap-2 py-1">
-                        <img src={progressData && progressData.lecturCompleted.includes(lecture.lectureId) ? assets.blue_tick_icon : assets.play_icon} alt="Play icon" className="w-4 h-4 mt-1" />
+                        <img
+                          src={
+                            progressData && progressData.lecturCompleted && progressData.lecturCompleted.includes(String(lecture.lectureId)) // Ensure type consistency
+                              ? assets.blue_tick_icon
+                              : assets.play_icon
+                          }
+                          alt="Play icon"
+                          className="w-4 h-4 mt-1"
+                        />
                         <div className="flex items-center justify-between w-full text-gray-800 text-xs md:text-default">
                           <p>{lecture.lectureTitle}</p>
                           <div className="flex gap-2">
                             {lecture.lectureUrl && (
-                              <p onClick={() => { setPlayerData({ videoId: extractVideoId(lecture.lectureUrl), chapter: index + 1, lecture: i + 1, lectureTitle: lecture.lectureTitle }); setVideoError(false); }} className="text-blue-500 cursor-pointer">
+                              <p onClick={() => { setPlayerData({ videoId: extractVideoId(lecture.lectureUrl), chapter: index + 1, lecture: i + 1, lectureTitle: lecture.lectureTitle, lectureId: lecture.lectureId }); setVideoError(false); }} className="text-blue-500 cursor-pointer">
                                 Watch
                               </p>
                             )}
@@ -159,8 +173,18 @@ const Player = () => {
               {videoError && <div className="text-red-500 text-center mt-2">This video is unavailable</div>}
               <div className="flex justify-between items-center mt-1">
                 <p>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
-                <button onClick={()=>markLectureAsCompleted(playerData.lectureId)} className="text-blue-500">
-                  {progressData && progressData.lecturCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark as completed'}
+                <button
+                  onClick={() => {
+                    if (!(progressData && progressData.lecturCompleted && progressData.lecturCompleted.includes(String(playerData.lectureId)))) {
+                      markLectureAsCompleted(playerData.lectureId);
+                    }
+                  }}
+                  className={`text-blue-500 ${progressData && progressData.lecturCompleted && progressData.lecturCompleted.includes(String(playerData.lectureId)) ? "cursor-default" : ""}`}
+                  disabled={progressData && progressData.lecturCompleted && progressData.lecturCompleted.includes(String(playerData.lectureId))}
+                >
+                  {progressData && progressData.lectureCompleted && progressData.lectureCompleted.includes(String(playerData.lectureId))
+                    ? "Completed"
+                    : "Mark as completed"}
                 </button>
               </div>
             </div>

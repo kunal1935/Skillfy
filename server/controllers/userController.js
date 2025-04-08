@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import Stripe from "stripe";
 import { Purchase } from "../models/Purchase.js";
 import Course from "../models/Course.js";
+import CourseProgress from "../models/CourseProgress.js"; // Added import for CourseProgress
+
 export const getUserData = async (req, res) => {
   try {
     const userId = req.auth.userId;
@@ -52,7 +54,7 @@ export const purchaseCourse = async (req, res) => {
   try {
     const { courseId } = req.body;
     console.log(courseId);
-    const  { origin }  = req.headers;
+    const { origin } = req.headers;
     const userId = req.auth.userId;
     console.log(userId);
     const userData = await User.findById(userId);
@@ -104,80 +106,84 @@ export const purchaseCourse = async (req, res) => {
     console.error("Error purchasing course:", error);
     res.json({ success: false, message: error.message });
   }
-}
+};
 
 //Update User Course Progress
-export const updateUserCourseProgress = async(req,res)=>{
-  try{
-    const userId = req.auth.userId;
-    const{courseId,lectureId} = req.body
-    const progressData = await CourseProgress.findOne({userId,courseId})
+export const updateUserCourseProgress = async (req, res) => {
+  try {
+    const {courseId, lectureId, userId} = req.body;
+    console.log(userId, courseId, lectureId);
+    if (!userId || !courseId || !lectureId) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
 
-    if(progressData){
-      if(progressData.lectureCompleted.includes(lectureId)){
-        return res.json({success:false,message:"Lecture already completed"})
+    const progressData = await CourseProgress.findOne({ userId, courseId });
+
+    if (progressData) {
+      if (progressData.lectureCompleted.includes(lectureId)) {
+        return res.json({ success: false, message: "Lecture already completed" });
       }
 
-      progressData.lectureCompleted.push(lectureId)
-      await progressData.save()
-    } else{
+      progressData.lectureCompleted.push(lectureId);
+      await progressData.save();
+    } else {
       await CourseProgress.create({
-        userId,
+        userId, // Ensure userId is passed
         courseId,
-        lectureCompleted:[lectureId]
-      })
+        lectureCompleted: [lectureId],
+      });
     }
-    res.json({success:true,message:"Lecture progress updated"})
-
-  }catch(error){
+    res.json({ success: true, message: "Lecture progress updated" });
+  } catch (error) {
     res.json({ success: false, message: error.message });
-
   }
-}
+};
 
 //Get User Course Progress
-export const getUserCourseProgress = async(req,res)=>{
-  try{
+export const getUserCourseProgress = async (req, res) => {
+  try {
     const userId = req.auth.userId;
-    const courseId = req.body
-    const progressData = await CourseProgress.findone({userId,courseId})
-    res.json({success:true,progressData})
-} catch(error){
+    const { courseId } = req.body; // Fixed destructuring for courseId
+    const progressData = await CourseProgress.findOne({ userId, courseId }); // Fixed typo: findone -> findOne
+    console.log(progressData);
+    res.json({ success: true, progressData });
+  } catch (error) {
+    console.log(error);
     res.json({ success: false, message: error.message });
   }
-}
+};
+
 //add user ratings to course
-
-export const addUserRatings = async(req,res)=>{
-  const userId= req.auth.userId;
-  const{courseId,rating}=req.body;
-  if(!courseId || !userId || !rating || rating<1 || rating >5){
-    return res.json({success:false,message:"Invalid data"})
+export const addUserRatings = async (req, res) => {
+  const userId = req.auth.userId;
+  const { courseId, rating } = req.body;
+  if (!courseId || !userId || !rating || rating < 1 || rating > 5) {
+    return res.json({ success: false, message: "Invalid data" });
   }
-  
-  try{
 
+  try {
     res.json({ success: false, message: error.message });
 
-    if(!course){
-      return res.json({success:false,message:"Course not found"});
+    if (!course) {
+      return res.json({ success: false, message: "Course not found" });
     }
     const user = await User.findById(userId);
 
-    if(!user || !user.enrolledCourses.includes(courseId)){
-      return res.json({success:false,message:"User not enrolled in this course"})
+    if (!user || !user.enrolledCourses.includes(courseId)) {
+      return res.json({ success: false, message: "User not enrolled in this course" });
     }
-    const existingRatingIndex = course.courseRatings.findIndex(r => r.userId === userId);
+    const existingRatingIndex = course.courseRatings.findIndex(
+      (r) => r.userId === userId
+    );
 
-  if(existingRatingIndex > -1){
-    course.courseRatings[existingRatingIndex].rating = rating;
-  } else {
-    course.courseRatings.push({userId,rating})
-  }
-  await course.save();
-  return res.json({success:true,message:"Rating added successfully"})
-  }  catch (error) {
+    if (existingRatingIndex > -1) {
+      course.courseRatings[existingRatingIndex].rating = rating;
+    } else {
+      course.courseRatings.push({ userId, rating });
+    }
+    await course.save();
+    return res.json({ success: true, message: "Rating added successfully" });
+  } catch (error) {
     res.json({ success: false, message: error.message });
   }
-  
-}
+};

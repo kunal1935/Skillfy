@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const Loading = () => {
 
-  const {path} =useParams()
+  const path =useParams()
   const navigate = useNavigate();
 
   useEffect(()=>{

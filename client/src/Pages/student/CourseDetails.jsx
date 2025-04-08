@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AppContext } from "../../context/AppContext";
+import {AppContext} from "../../context/AppContext.jsx";
 import Loading from "../../Components/student/Loading";
 import { assets } from "../../assets/assets";
 import humanizeDuration from "humanize-duration";
@@ -14,6 +14,7 @@ const CourseDetails = () => {
   const [courseData, setCourseData] = useState(null);
   const [openSections, setOpenSections] = useState({});
   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false);
+  
   const [playerData, setPlayerData] = useState(null);
 
   const {
@@ -25,7 +26,6 @@ const CourseDetails = () => {
     currency,backendUrl,userData,getToken
   } = useContext(AppContext);
 
-  console.log(userData);
   const fetchCourseData = async () => {
       try{
     const{data} = await axios.get(backendUrl  +'/api/course/'+ id)
@@ -49,7 +49,7 @@ const CourseDetails = () => {
         return toast.warn('Already Enrolled')
        }
        const token = await getToken();
-       const{data} = await axios.post('http://localhost:7474/api/user/purchase',
+       const {data} = await axios.post('http://localhost:7474/api/user/purchase',
         {courseId: courseData._id},{headers :{Authorization: `Bearer ${token}`}})
         if(data.success){
           const{session_url} = data
@@ -67,9 +67,14 @@ const CourseDetails = () => {
     fetchCourseData();
   }, [])
 
+  
+
   useEffect(() => {
+    console.log('userData',userData)
+      console.log('courseData',courseData)
     if(userData && courseData){
-      setIsAlreadyEnrolled(userData.enrolledCourses.includes(courseData._id))
+      const isEnrolled = userData.enrolledCourses.some((course) => course._id === courseData._id);
+      setIsAlreadyEnrolled(isEnrolled);
     }
   }, [userData,courseData]);
 

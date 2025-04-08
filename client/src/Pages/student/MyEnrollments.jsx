@@ -6,7 +6,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const MyEnrollments = () => {
-  const{enrolledCourses,calculateCourseDuration,navigate,userData,fetchUserEnrolledCourses,backendUrl,getToken,calculateNoOfLectures}=useContext(AppContext)
+  const{enrolledCourses,calculateCourseDuration,navigate,userData,fetchUserEnrolledCourses,backendUrl,getToken,calculateNoOfLecture}=useContext(AppContext)
   const[progressArray,setProgressArray] = useState([])
   const getCourseProgress = async () =>{
     try{
@@ -14,7 +14,8 @@ const MyEnrollments = () => {
     const tempProgressArray = await Promise.all(
       enrolledCourses.map(async (course)=>{
         const {data} = await axios.post(`${backendUrl}/api/user/get-course-progress`,{courseId:course._id},{headers:{Authorization:`Bearer ${token}`}})
-        let totalLectures = calculateNoOfLectures(course);
+        let totalLectures = calculateNoOfLecture(course);
+        console.log(totalLectures);
 
        const lectureCompleted = data.progressData ? data.progressData.
        lectureCompleted.length : 0;
