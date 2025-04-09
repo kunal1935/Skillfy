@@ -1,35 +1,14 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { dummyStudentEnrolled } from '../../assets/assets';
 import Loading from '../../Components/student/Loading';
-import { AppContext } from '../../context/AppContext';
-import axios from 'axios';
-import { toast } from 'react-toastify';
 
 const StudentsEnrolled = () => {
-  const {backendurl ,getToken ,isEducator}=useContext(AppContext)
-  const [enrolledStudent, setEnrolledStudent] = useState(null)
-
-  const fetchEnrolledStudent = async () => {
-    try {
-      const token = await getToken()
-      const {data}=await axios.get(backendurl + '/api/educator/enrolled-students',
-        {headers:{Authorization:`Bearer ${token}`}})
-
-        if(data.success){
-          setEnrolledStudent(data.enrolledStudent.reverse())
-        }else{
-          toast.error(data.message)
-        }
-    } catch (error) {
-      toast.error(error.message)
-    }
-  }
+  const [enrolledStudent, setEnrolledStudent] = useState(null);
 
   useEffect(() => {
-    if(isEducator){
-    fetchEnrolledStudent()
-    }
-  }, [isEducator])
+    // Simulate fetching data from the frontend
+    setEnrolledStudent(dummyStudentEnrolled.reverse());
+  }, []);
 
   return enrolledStudent ? (
     <div className='h-screen flex flex-col items-center justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0'>
